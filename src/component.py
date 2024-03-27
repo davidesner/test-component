@@ -6,8 +6,9 @@ import csv
 import logging
 from datetime import datetime
 
-from keboola.component.base import ComponentBase
+from keboola.component.base import ComponentBase, sync_action
 from keboola.component.exceptions import UserException
+from keboola.component.sync_actions import SelectElement
 
 # configuration variables
 KEY_API_TOKEN = '#api_token'
@@ -32,6 +33,10 @@ class Component(ComponentBase):
 
     def __init__(self):
         super().__init__()
+
+    @sync_action('list_columns')
+    def get_columns(self):
+        return [SelectElement(value='sdsd', label='Some Value')]
 
     def run(self):
         """
@@ -60,7 +65,8 @@ class Component(ComponentBase):
         logging.info(previous_state.get('some_state_parameter'))
 
         # Create output table (Tabledefinition - just metadata)
-        table = self.create_out_table_definition('output.csv', incremental=True, primary_key=['timestamp'])
+        table = self.create_out_table_definition('output.csv', incremental=True, primary_key=['timestamp'],
+                                                 destination='in.c-mydata.output')
 
         # get file path of the table (data/out/tables/Features.csv)
         out_table_path = table.full_path
